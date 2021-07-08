@@ -2,23 +2,31 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+
+//libraries for files
 #include <fstream>
 #include <sstream>
 #include <string>
+
+//libraries for platform independent delay. Supports C++11 upwards
 #include <chrono>
 #include <thread>
 
 using namespace std;
 
 class Concore{
+
+    //private variables
     string s,olds;
     string inpath = "./in";
     string outpath = "./out";
+
  public:
     int delay = 1;
     int retrycount = 0;
     int simtime;
 
+    //function to compare and determine whether file content has been changed
     bool unchanged(){
         if(olds.compare(s)==0){
             s = "";
@@ -30,8 +38,9 @@ class Concore{
         }
     }
 
+    //accepts the file name as string and returns a string of file content
     string read(int port, string name, string initstr){
-        chrono::seconds timespan(delay); // or whatever
+        chrono::seconds timespan(delay);
         this_thread::sleep_for(timespan);
         string ins;
         try {
@@ -40,7 +49,7 @@ class Concore{
             if(infile) {
                 ostringstream ss;
                 ss << infile.rdbuf(); // reading data
-                ins = ss.str();
+                ins = ss.str(); //saving data as string
             }
             infile.close();
         }
@@ -57,6 +66,7 @@ class Concore{
                 ss << infile.rdbuf(); // reading data
                 ins = ss.str();
             }
+            //observed retry count in C++ from various tests is approx 80.
             retrycount++;
         }
         s += ins;
@@ -76,11 +86,13 @@ class Concore{
         for(int j=i+1;j<(int)ins.length();j++){
             inval+=ins[j];
         }
+
+        //returning a string with data excluding simtime
         return inval;
 
     }
 
-
+    //write method, accepts a string (essentially python list) and writes it to the file
     void write(int port, string name, string val, int delta=0){
 
         try {
@@ -88,13 +100,13 @@ class Concore{
             ofstream outfile;
             outfile.open(outpath+to_string(port)+"/"+name);
             if (val[0]=='['){
-                temp+='[';
-                for(int i=1;i<(int)val.length();i++)
-                    temp+=val[i];
-                string tempvar = to_string(simtime+delta);
-                tempvar+=',';
-                temp.insert(1,tempvar);
-                outfile<<temp;
+            temp+='[';
+            for(int i=1;i<(int)val.length();i++)
+                temp+=val[i];
+            string tempvar = to_string(simtime+delta);
+            tempvar+=',';
+            temp.insert(1,tempvar);
+            outfile<<temp;
             }
             else {
                 outfile<<val;
@@ -105,6 +117,7 @@ class Concore{
         }
     }
     
+    //Initialising
     string initval(string f){
         int i;
         string val,temp;
@@ -119,7 +132,10 @@ class Concore{
             }
         }
 
-        simtime = stoi(temp);
+        //determining simtime
+        simtime = stof(temp);
+
+        //saving the rest of the values(except simtime) in val
         for(int j=i+1;j<(int)f.length();j++){
             val+=f[j];
         }
