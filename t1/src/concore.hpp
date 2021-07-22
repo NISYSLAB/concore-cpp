@@ -1,7 +1,7 @@
 // concore.hpp -- this C++ include file will be the equivalent of concore.py
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <vector>
+#include <iomanip> //for setprecision
 
 //libraries for files
 #include <fstream>
@@ -24,7 +24,7 @@ class Concore{
  public:
     int delay = 1;
     int retrycount = 0;
-    int simtime;
+    float simtime;
 
     //function to compare and determine whether file content has been changed
     bool unchanged(){
@@ -38,8 +38,29 @@ class Concore{
         }
     }
 
+    vector<double> parser(string f){
+        vector<double> temp;
+        string value = "";
+    
+        //Changing last bracket to comma to use comma as a delimiter
+        f[f.length()-1]=',';
+
+        for(int i=1;i<f.length()-1;i++){
+            if(f[i]!=',')
+                value+=f[i];
+            else{
+                if((int)value.size()!=0)
+                    temp.push_back(stod(value));
+                
+                //reset value
+                value = "";
+            }
+        }
+        return temp;
+    }
+
     //accepts the file name as string and returns a string of file content
-    string read(int port, string name, string initstr){
+    vector<double> read(int port, string name, string initstr){
         chrono::seconds timespan(delay);
         this_thread::sleep_for(timespan);
         string ins;
@@ -71,46 +92,42 @@ class Concore{
         }
         s += ins;
 
-        int i;
-        string inval,temp;
-        inval+='[';
 
-        for(i=1;i<(int)ins.length();i++){
-            if(ins[i]==',')
-                break;
-            else{
-                temp+=ins[i];
-            }
-        }
-        simtime = max(simtime,stoi(temp));
-        for(int j=i+1;j<(int)ins.length();j++){
-            inval+=ins[j];
-        }
+        vector<double> inval = parser(ins);
+        simtime = inval[0];
 
         //returning a string with data excluding simtime
+        inval.erase(inval.begin());
         return inval;
 
     }
 
-    //write method, accepts a string (essentially python list) and writes it to the file
+    //write method, accepts a vector double and writes it to the file
+    void write(int port, string name, vector<double> val, int delta=0){
+
+        try {
+            ofstream outfile;
+            outfile.open(outpath+to_string(port)+"/"+name);
+            val.insert(val.begin(),simtime+delta);
+            outfile<<'[';
+            for(int i=0;i<val.size()-1;i++)
+                outfile<<setprecision(2)<<fixed<<val[i]<<',';
+            outfile<<setprecision(2)<<fixed<<val[val.size()-1]<<']';
+            }
+
+        catch(...){
+            cout<<"skipping +"<<outpath<<port<<" /"<<name;
+        }
+    }
+
+    //write method, accepts a string and writes it to the file
     void write(int port, string name, string val, int delta=0){
 
         try {
             string temp;
             ofstream outfile;
             outfile.open(outpath+to_string(port)+"/"+name);
-            if (val[0]=='['){
-            temp+='[';
-            for(int i=1;i<(int)val.length();i++)
-                temp+=val[i];
-            string tempvar = to_string(simtime+delta);
-            tempvar+=',';
-            temp.insert(1,tempvar);
-            outfile<<temp;
-            }
-            else {
-                outfile<<val;
-            }
+            outfile<<setprecision(2)<<fixed<<val;
         }
         catch(...){
             cout<<"skipping +"<<outpath<<port<<" /"<<name;
@@ -118,27 +135,15 @@ class Concore{
     }
     
     //Initialising
-    string initval(string f){
-        int i;
-        string val,temp;
-        val+='[';
-
-        for(i=1;i<f.length();i++){
-            if(f[i]==','){
-                break;
-            }
-            else{
-                temp+=f[i];
-            }
-        }
+    vector<double> initval(string f){
+        //parsing
+        vector<double> val = parser(f);
 
         //determining simtime
-        simtime = stof(temp);
+        simtime = val[0];
 
-        //saving the rest of the values(except simtime) in val
-        for(int j=i+1;j<(int)f.length();j++){
-            val+=f[j];
-        }
+        //returning the rest of the values(except simtime) in val
+        val.erase(val.begin());
         return val;
     }    
 

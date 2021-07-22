@@ -1,8 +1,9 @@
 #include "concore.hpp"
 //instead of below, this file will be C++ equivalent of cpymat.py
-#include "stdlib.h"
+#include <vector>
 #include <string>
 #include <chrono>
+#include <iomanip> //setprecision
 
 using namespace std;
 int main()
@@ -16,20 +17,18 @@ int main()
   int maxElapsed = 0;
   int sumElapsed  = 0;
 
-  string u = concore.initval(init_simtime_u);
+  vector<double> u = concore.initval(init_simtime_u);
   auto wallclock1 = chrono::high_resolution_clock::now();
 
-  string ym;
+  vector<double> ym;
   while(concore.simtime<Nsim){
     while (concore.unchanged()){
       ym = concore.read(1,"ym",init_simtime_ym);
     }
 
-    string temp=ym.substr(1,ym.find(",")-1);
-    string ans = to_string((stof(temp) + 10000)).substr(0,to_string((stof(temp) + 10000)).find(".")+2);
-    u.replace(1,u.find(",")-1,ans);
+    u[0]  = ym[0]+1;
 
-    cout<<"ym="<<ans<<" u="<<temp<<endl;
+    cout<<setprecision(2)<<"ym="<<ym[0]<<" u="<<u[0]<<endl;
     concore.write(1,"u",u);
 
     auto wallclock2 = chrono::high_resolution_clock::now();
@@ -41,7 +40,7 @@ int main()
     maxElapsed = max(maxElapsed, elapsed);
 
   }
-concore.write(1,"ym",init_simtime_ym);
+concore.write(1,"u",init_simtime_u);
 cout<<"retry="<<concore.retrycount<<endl;
 
 cout<<"min="<<minElapsed<<endl;
