@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <iomanip> //for setprecision
+#include <map>
 
 //libraries for files
 #include <fstream>
@@ -25,6 +26,58 @@ class Concore{
     int delay = 1;
     int retrycount = 0;
     float simtime;
+    map <string, int> iport;
+    map <string, int> oport;
+
+    //Constructor to put in iport and oport values in map
+    Concore(){
+        iport = mapParser("concore.iport");
+        oport = mapParser("concore.oport");         
+    }
+
+    map<string,int> mapParser(string filename){
+        map<string,int> ans;
+
+        ifstream portfile;
+        string portstr;
+        portfile.open(filename);
+        if(portfile){
+            ostringstream ss;
+            ss << portfile.rdbuf();
+            portstr = ss.str();
+        }
+        portfile.close();
+
+        portstr[portstr.size()-1]=',';
+        portstr+='}';
+        int i=0;
+        string portname="";
+        string portnum="";
+
+        while(portstr[i]!='}'){
+            if(portstr[i]=='\''){
+                i++;
+                while(portstr[i]!='\''){
+                    portname+=portstr[i];
+                    i++;
+                }
+                ans.insert({portname,0});
+            }
+
+            if(portstr[i]==':'){
+                i++;
+                while(portstr[i]!=','){
+                    portnum+=portstr[i];
+                    i++;
+                }
+                ans[portname]=stoi(portnum);
+                portnum="";
+                portname="";
+            }  
+            i++;
+        }
+        return ans;
+    }
 
     //function to compare and determine whether file content has been changed
     bool unchanged(){
