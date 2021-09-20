@@ -98,7 +98,7 @@ class Concore{
         //Changing last bracket to comma to use comma as a delimiter
         f[f.length()-1]=',';
 
-        for(int i=1;i<f.length()-1;i++){
+        for(int i=1;i<f.length();i++){
             if(f[i]!=',')
                 value+=f[i];
             else{
@@ -147,7 +147,7 @@ class Concore{
 
 
         vector<double> inval = parser(ins);
-        simtime = inval[0];
+        simtime = simtime > inval[0] ? simtime : inval[0];
 
         //returning a string with data excluding simtime
         inval.erase(inval.begin());
@@ -164,8 +164,8 @@ class Concore{
             val.insert(val.begin(),simtime+delta);
             outfile<<'[';
             for(int i=0;i<val.size()-1;i++)
-                outfile<<setprecision(2)<<fixed<<val[i]<<',';
-            outfile<<setprecision(2)<<fixed<<val[val.size()-1]<<']';
+                outfile<<val[i]<<',';
+            outfile<<val[val.size()-1]<<']';
             }
 
         catch(...){
@@ -180,7 +180,7 @@ class Concore{
             string temp;
             ofstream outfile;
             outfile.open(outpath+to_string(port)+"/"+name);
-            outfile<<setprecision(2)<<fixed<<val;
+            outfile<<val;
         }
         catch(...){
             cout<<"skipping +"<<outpath<<port<<" /"<<name;

@@ -19,20 +19,16 @@ int main(){
     vector<double> u;
     while(concore.simtime<Nsim){
         while (concore.unchanged()){
-            auto it_iport_u = concore.iport.find("VC");
-            u = concore.read(it_iport_u->second,"u",init_simtime_u);
+            u = concore.read(concore.iport["VC"],"u",init_simtime_u);
         }
 
-        auto it_oport_u = concore.oport.find("VXP");
-        concore.write(it_oport_u->second,"u",u);
+        concore.write(concore.oport["VXP"],"u",u);
 
         while (concore.unchanged()){
-            auto it_iport_ym = concore.iport.find("VP");
-            ym = concore.read(it_iport_ym->second,"ym",init_simtime_ym);
+            ym = concore.read(concore.iport["VP"],"ym",init_simtime_ym);
         }
 
-        auto it_oport_ym = concore.oport.find("VXC");
-        concore.write(it_oport_ym->second,"ym",ym);
+        concore.write(concore.oport["VXC"],"ym",ym);
 
         cout<<"powermeter u=[";
         for(int j=0;j<u.size();j++){
