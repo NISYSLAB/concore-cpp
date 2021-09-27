@@ -25,7 +25,7 @@ class Concore{
  public:
     int delay = 1;
     int retrycount = 0;
-    float simtime;
+    int simtime;
     map <string, int> iport;
     map <string, int> oport;
 
@@ -119,13 +119,14 @@ class Concore{
         string ins;
         try {
             ifstream infile;
-            infile.open(inpath+to_string(port)+"/"+name);
+            infile.open(inpath+to_string(port)+"/"+name, ios::in);
             if(infile) {
                 ostringstream ss;
                 ss << infile.rdbuf(); // reading data
                 ins = ss.str(); //saving data as string
+                infile.close();
             }
-            infile.close();
+            else throw 505;
         }
         catch (...) {
             ins = initstr;
@@ -134,14 +135,25 @@ class Concore{
         while ((int)ins.length()==0){
             this_thread::sleep_for(timespan);
             ifstream infile;
-            infile.open(inpath+to_string(port)+"/"+name);
-            if(infile) {
-                ostringstream ss;
-                ss << infile.rdbuf(); // reading data
-                ins = ss.str();
+            infile.open(inpath+to_string(port)+"/"+name, ios::in);
+            try{
+                if(infile) {
+                    ostringstream ss;
+                    ss << infile.rdbuf(); // reading data
+                    ins = ss.str();
+                    retrycount++;
+                }
+                else{
+                retrycount++;
+                throw 505;
+                }
             }
             //observed retry count in C++ from various tests is approx 80.
-            retrycount++;
+            catch(...){
+                cout<<"Read error";
+            }
+            
+            
         }
         s += ins;
 
@@ -160,12 +172,17 @@ class Concore{
 
         try {
             ofstream outfile;
-            outfile.open(outpath+to_string(port)+"/"+name);
-            val.insert(val.begin(),simtime+delta);
-            outfile<<'[';
-            for(int i=0;i<val.size()-1;i++)
-                outfile<<val[i]<<',';
-            outfile<<val[val.size()-1]<<']';
+            outfile.open(outpath+to_string(port)+"/"+name, ios::out);
+            if(outfile){
+                val.insert(val.begin(),simtime+delta);
+                outfile<<'[';
+                for(int i=0;i<val.size()-1;i++)
+                    outfile<<val[i]<<',';
+                outfile<<val[val.size()-1]<<']';
+                }
+            else{
+                throw 505;
+                }
             }
 
         catch(...){
@@ -175,12 +192,15 @@ class Concore{
 
     //write method, accepts a string and writes it to the file
     void write(int port, string name, string val, int delta=0){
-
+        chrono::seconds timespan(2*delay);
+        this_thread::sleep_for(timespan);
         try {
             string temp;
             ofstream outfile;
-            outfile.open(outpath+to_string(port)+"/"+name);
-            outfile<<val;
+            outfile.open(outpath+to_string(port)+"/"+name, ios::out);
+            if(outfile)
+                outfile<<val;
+            else throw 505;
         }
         catch(...){
             cout<<"skipping +"<<outpath<<port<<" /"<<name;
