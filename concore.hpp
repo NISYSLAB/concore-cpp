@@ -23,9 +23,9 @@ class Concore{
     string outpath = "./out";
 
  public:
-    int delay = 1;
+    double delay = 1;
     int retrycount = 0;
-    int simtime;
+    double simtime;
     map <string, int> iport;
     map <string, int> oport;
 
@@ -114,7 +114,7 @@ class Concore{
 
     //accepts the file name as string and returns a string of file content
     vector<double> read(int port, string name, string initstr){
-        chrono::seconds timespan(delay);
+        chrono::milliseconds timespan((int)(1000*delay));
         this_thread::sleep_for(timespan);
         string ins;
         try {
@@ -195,7 +195,7 @@ class Concore{
 
     //write method, accepts a string and writes it to the file
     void write(int port, string name, string val, int delta=0){
-        chrono::seconds timespan(2*delay);
+        chrono::milliseconds timespan((int)(2000*delay));
         this_thread::sleep_for(timespan);
         try {
             string temp;
