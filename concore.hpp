@@ -18,7 +18,7 @@ using namespace std;
 class Concore{
 
     //private variables
-    string s,olds;
+    string s="",olds="";
     string inpath = "./in";
     string outpath = "./out";
 
@@ -45,8 +45,8 @@ class Concore{
             ostringstream ss;
             ss << portfile.rdbuf();
             portstr = ss.str();
+            portfile.close();
         }
-        portfile.close();
 
         portstr[portstr.size()-1]=',';
         portstr+='}';
@@ -126,7 +126,8 @@ class Concore{
                 ins = ss.str(); //saving data as string
                 infile.close();
             }
-            else throw 505;
+            else {
+                throw 505;}
         }
         catch (...) {
             ins = initstr;
@@ -134,18 +135,19 @@ class Concore{
         
         while ((int)ins.length()==0){
             this_thread::sleep_for(timespan);
-            ifstream infile;
-            infile.open(inpath+to_string(port)+"/"+name, ios::in);
             try{
+                ifstream infile;
+                infile.open(inpath+to_string(port)+"/"+name, ios::in);
                 if(infile) {
                     ostringstream ss;
                     ss << infile.rdbuf(); // reading data
                     ins = ss.str();
                     retrycount++;
+                    infile.close();
                 }
                 else{
-                retrycount++;
-                throw 505;
+                    retrycount++;
+                    throw 505;
                 }
             }
             //observed retry count in C++ from various tests is approx 80.
@@ -179,6 +181,7 @@ class Concore{
                 for(int i=0;i<val.size()-1;i++)
                     outfile<<val[i]<<',';
                 outfile<<val[val.size()-1]<<']';
+                outfile.close();
                 }
             else{
                 throw 505;
@@ -198,8 +201,10 @@ class Concore{
             string temp;
             ofstream outfile;
             outfile.open(outpath+to_string(port)+"/"+name, ios::out);
-            if(outfile)
+            if(outfile){
                 outfile<<val;
+                outfile.close();
+            }
             else throw 505;
         }
         catch(...){

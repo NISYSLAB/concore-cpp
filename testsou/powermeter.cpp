@@ -7,7 +7,7 @@
 using namespace std;
 int main(){
 
-    cout<<"powermeter";
+    cout<<"powermeter"<<endl;
     Concore concore;
     concore.delay = 0.07;
     int Nsim = 100;

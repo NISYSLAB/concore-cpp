@@ -28,7 +28,7 @@ int main()
 
     u[0]  = ym[0]+1;
 
-    cout<<setprecision(2)<<"ym="<<ym[0]<<" u="<<u[0]<<endl;
+    cout<<"ym="<<ym[0]<<" u="<<u[0]<<endl;
     concore.write(1,"u",u);
 
     auto wallclock2 = chrono::high_resolution_clock::now();

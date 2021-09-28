@@ -23,7 +23,7 @@ int main()
 
     ym[0]  = u[0]+10000;
 
-    cout<<"ym="<<ym[0]<<" u="<<u[0]<<endl;
+    cout<<setprecision(1)<<fixed<<"ym="<<ym[0]<<" u="<<u[0]<<endl;
     concore.write(1,"ym",ym,1);
   }
   concore.write(1,"ym",init_simtime_ym);
