@@ -54,12 +54,17 @@ $ python mkconcore.py testZ.graphml testsou t2 windows
 3. MacOS
 
 ### Repository structure guidelines
-1. The repo contains the original python files (`pmpymat.py`, `cpymat.py` and `powermeter.py`) as well as their c++ translations (`pmpymat.cpp`, `cpymat.cpp` and `powermeter.cpp`) in testsou directory. `concore.py` and `concore.hpp` are present in the root directory.
+1. The repo contains the original python files (`pmpymat.py`, `cpymat.py` and `powermeter.py`) as well as their c++ translations (`pmpymat.cpp`, `cpymat.cpp` and `powermeter.cpp`) in `testsou` directory. `concore.py` and `concore.hpp` are present in the root directory.
+
 2. The source directory has files involving the neuromodultation which is outside the current scope.
+
 3. The graphml files which have a 'C' in their name work with C++ translated files. Others work with the python files. <br />
    Some highlights - <br />
-    `testZ.graphml` - Basic Python functionality. `testZC.graphml` - Basic C++ functionality. <br />
-    `test3.graphml` - Python with multiple port functionality `test3C.graphml` - C++ with multiple port functionality<br />
+    `testZ.graphml` - Basic Single Port Python functionality. <br/> 
+    `testZC.graphml` - Basic Single Port Python and C++ integration functionality. <br />
+    `testCC.graphml` - Basic Single Port pure C++ functionality. <br />
+    `test3.graphml` - Python with multiple port functionality. <br />
+    `testC3.graphml` - C++ with multiple port functionality. <br />
     
     <br /> To view these graphml files, yEd can be used.
 
